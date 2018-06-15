@@ -1,9 +1,8 @@
+const config = require("./config");
 const Sequelize = require('sequelize');
-const db = new Sequelize('postgres://localhost:5432/wikistack');
+//const db = new Sequelize(config.database, config.username, config.password, config.config);
+const db = new Sequelize();
 
-// module.exports = {
-//     db
-// }
 
 const Page = db.define('pages',{
     title: {
