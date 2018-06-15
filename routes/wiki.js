@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addPage } = require("../views");
+const { addPage, wikiPage } = require("../views");
 const { Page, User } = require("../models");
 
 const bodyParser = require('body-parser');
@@ -13,18 +13,14 @@ router.get('/', (req, res, next) => {
 })
 
 router.post('/', async (req, res, next) => {
-    res.json(req.body);
     const name = req.body.name;
     const email = req.body.email;
     const title = req.body.title;
     const content = req.body.content;
     const status = req.body.status;
-    // const slug = generateSlug(title);
-
 
     const page = new Page({
         title: title,
-        //slug: slug,
         content: content,
         status: status
     })
@@ -35,8 +31,10 @@ router.post('/', async (req, res, next) => {
 
     try {
         await page.save();
-        await user.save(); 
-        res.redirect('/');
+        await user.save();
+        console.log(page);
+        console.log(user);
+        res.redirect(`/wiki/${page.slug}`);
     }
     catch(err){
         next(err);
@@ -47,5 +45,20 @@ router.post('/', async (req, res, next) => {
 router.get('/add', (req, res, next) => {
     res.send(addPage());
 });
+
+router.get('/:slug', async (req, res, next) => {
+    try {
+        const page = await Page.findOne({
+            where: {
+                slug:req.params.slug
+            }
+        });
+        res.send(wikiPage(page));
+    } catch(error) {
+        next(error)
+    };
+  //res.send(`hit dynamic route at ${req.params.slug}`);
+});
+
 
 module.exports = router;
